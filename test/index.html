@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<!-- 
+/**
+ * Filename            :   index3.html
+ * Author              :   Wang Xiang
+ * Description         :   课表模板（动改静），在init修改内容，如重复加入jxid
+ * Revision History    :   24-04-22
+ * Revision            :   1.0
+ */
+ -->
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="工大课表">
+<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-57x57-precomposed.png"/>
+	<title>工大课表 | 沈工大教务通</title>
+	<style type="text/css">
+		*{
+			margin: 0px;
+			padding: 0px;
+		}
+		body{
+			font-family: \5FAE\8F6F\96C5\9ED1;
+    		background-color: #fff;
+		}
+		.bglogo{
+			z-index: -1;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			left: 0px;
+			top: 0px;
+    		background-image: url('./logo.png');
+    		background-size: 50%;
+    		background-position: 50%;
+    		background-repeat: no-repeat;
+		}
+		.head{
+			position: fixed;
+			top: 0px;
+			width: 100%;
+			left: 0px;
+			background-color: #2472b2;
+			height: 50px;
+			z-index: 9999;
+			box-shadow: 0px 0px 5px 2px rgba(112, 112, 112, 0.4);
+		}
+		.head .title{
+			color: white;
+			font-size: 1.5em;
+			height: 50px;
+			line-height: 50px;
+			text-align: center;
+			position: relative;
+		}
+		.content{
+			display: inline-block;
+			margin-top: 50px;
+			overflow-x: auto;
+			overflow-y: auto;
+			position: relative;
+		}
+
+		.table{
+			border-collapse:collapse;
+			width: 100%;
+		}
+		table,thead,tbody,tr,td{
+			/*border: 1px solid red;*/
+		}
+		td,th{
+			min-width:60px; 
+		}
+		.td1{
+			color: white;
+			min-width: 40px;
+			text-align: center;
+			background-color:  #2472b2;
+		}
+		th{
+			height: 30px;
+
+		}
+		tr{
+			height: 60px;
+		}
+		.col{
+			position: absolute;
+			display: inline-block;
+			display: none;
+			width: 60px;
+			height: 100%;
+			left: 101px;
+			background-color: rgba(241,234,177,0.5);
+			z-index: -1;
+		}
+		.line{
+			position: absolute;
+			display: inline-block;
+			width: 100%;
+			height: 1.5px;
+			box-shadow: 0px 0px 2px #ddd;
+			background-color: rgba(248,36,81,0.6);
+			top: 354px;
+			left: 0px;
+		}
+		.week{
+			width: 95%;
+			margin: auto;
+			height: 85%;
+			background-color: #2472b2;
+			border-radius: 5px;
+			line-height: 30px;
+			color: white;
+			font-weight: lighter;
+		}
+		.floatBox{
+			width: 90px;
+			height: 40px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 5px 2px rgba(112, 112, 112, 0.4);
+			border: 2px solid white;
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			background-color: #2472b2;
+			color: white;
+			font-size: 0.9em;
+			line-height: 40px;
+			text-align: center;
+			font-weight: bold;
+		}
+		.left{
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			left: 10px;
+		}
+		.right{
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			right: 10px;
+		}
+		.toast{
+			position: fixed;
+			margin: 0px auto;
+			top: 40%;
+		    left: 0px;
+		    right: 0px;
+		    margin-left:auto;
+		    margin-right:auto;
+		    text-align: center;
+		}
+
+		.toastContent{
+		    max-width: 50%;
+			position: relative;
+			padding: 10px 20px;
+			display: inline-block;
+			min-height: 20px;
+			background-color: rgb(88,88,88);
+			border-radius: 5px;
+			color: white;
+			line-height: 20px;
+			text-align: center;
+			font-size: 0.9em;
+			margin: 0px auto;
+		}
+
+
+		.box{
+			position: absolute;
+			display: inline-block;
+			width: 51px;
+			height: 110px;
+			padding: 3px;
+			border-radius: 3px;
+			color: white;
+			font-size: 0.9em;
+			left: 42px;
+			top: 37px;
+			font-size: 0.75em;
+		}
+
+		.color1{ /*紫色*/
+			background-color: #a136d8;
+		}
+		.color2{ /*红色*/
+			background-color: #dc3155;
+		}
+		.color3{ /*粉色*/
+			background-color: #dc31ae;
+		}
+		.color4{ /*蓝色*/
+			background-color: #4d31dc;
+		}
+		.color5{ /*绿色*/
+			background-color: #31dc8a;
+		}
+		.color6{ /*橙色*/
+			background-color: #dc8631;
+		}
+		.color7{ /*黄色*/
+			background-color: #e6ca0c;
+		}
+		.colorNo{ /*灰色*/
+			background-color: #9b9b9b;
+		}
+		.colorB{ /*黑色*/
+			background-color: #424242;
+			background-image: linear-gradient(160deg, #b100ff 20%,#00b3ff 80%);
+		}
+		/*wpk*/
+		.wpk{
+			left: 0px;
+			top: 0px;
+			z-index: 99999;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(30,30,30,0.9);
+			color: white;
+		}
+		.wpk .title{
+			font-size: 1.6em;
+			position: relative;
+			top: 20px;
+			left: 20px;
+		}
+		.wpk .tip{
+			position: relative;
+			top: 20px;
+			left: 20px;
+		}
+		.wpk .wpkbox{
+			overflow-y:auto;
+			position: relative;
+			top: 20px;
+			width: 90%;
+			margin: 0px auto;
+			height: calc(100% - 100px);
+		}
+		.wpk .wpkitem{
+			margin-top: 20px;
+			position: relative;
+			width: 100%;
+			height: auto;
+			padding: 10px 0px;
+			background-color: #9b9b9b;
+			border-radius: 8px;
+		}
+		.kechengming{
+			margin:0px 10px;
+		}
+
+		/*关于*/
+		.about{
+			position: fixed;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			box-shadow: 0px 0px 5px 2px rgba(112, 112, 112, 0.4);
+			border: 1px solid white;
+			bottom: 80px;
+			right: 20px;
+			background-size: 40px 40px;
+			background-position: 50%;
+			background-repeat: no-repeat;
+			background-image: url('./about.png');
+			background-color: white;
+		}
+		.aboutPage{
+			font-size: 0.9em;
+    		color:rgb(75, 75, 75);
+			position: fixed;
+			width: 100%;
+			height: 100%;
+    		background-color: #f8f8f8;
+    		left: 0px;
+    		top: 0px;
+    		z-index: 99999;
+    		text-align: center;
+		}
+		.duomologo{
+			position: relative;
+			top: 40px;
+		}
+		.info{
+			position: relative;
+			top: 80px;
+		}
+		.version{
+			position: relative;
+			top: 85px;
+		}
+		.thanks{
+			position: relative;
+			top: 105px;
+		}
+		.footer{
+			position: absolute;
+			font-size: 0.75em;
+			width: 100%;
+			text-align: center;
+			bottom: 30px;
+		}
+
+		.today{
+			background-color: #1ecebf;
+		}
+		/*Vue*/
+		[v-cloak] {
+		    display: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="bglogo"></div>
+	<div id="app" v-cloak>
+		<div class="head">
+			<div class="title">
+				<div class="left" v-on:click="left"><</div>
+				<div class="right" v-on:click="right">></div>
+				第 {{week}} 周
+			</div>
+		</div>
+		<div class="content">
+			<!-- 今日线 -->
+			<div class="col"></div>
+			<table class="table">
+				<thead>
+					<tr style="height: 35px;">
+						<th class="td1">
+							{{Date.M}}月
+						</th>
+						<th class="th">
+							<div class="week" v-bind:class="{ today:toDay == 1 }">
+								一({{Date.W1}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 2 }">
+								二({{Date.W2}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 3 }">
+								三({{Date.W3}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 4 }">
+								四({{Date.W4}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 5 }">
+								五({{Date.W5}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 6 }">
+								六({{Date.W6}})
+							</div>
+						</th>
+						<th  class="th">
+							<div class="week" v-bind:class="{ today:toDay == 0 }">
+								日({{Date.W7}})
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">1</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">2</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">3</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">4</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr  style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">5</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr  style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">6</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">7</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">8</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr  style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">9</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr  style="background-color: rgba(230,230,230,0.5)">
+						<td class="td1">10</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">11</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="td1">12</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<!-- 课程格子 -->
+			<div v-for="item in cellData" class="box" v-bind:class="item.color" v-bind:style="{left:item.left+'px',top:item.top+'px',height:item.height+'px'}" v-bind:data-id="item.id" v-on:click="mxClick">
+				{{item.content}}
+			</div>
+
+			<!-- 时刻线 -->
+			<div class="line" v-bind:style="{top: clockLineTop + 'px'}"></div>
+		</div>
+		<div class="about" v-on:click="aboutClick"></div>
+		<div class="floatBox" v-on:click="wpkClick">
+			未排课({{wpkNum}})
+		</div>
+		<div class="toast" id="toast" style="display: none;">
+			<div class="toastContent">{{toastContent}}</div>
+		</div>
+		<div class="wpk" id="mx" style="display: none;" v-on:click="closeMx">
+			<div class="title">明细</div>
+			<div class="wpkbox">
+				<!-- <div v-for="item in wpkList" class="wpkitem">
+					<div class="kechengming">{{item.KCMC}}</div>
+					<div class="kechengming">@{{item.JSXM}}</div>
+				</div> -->
+				<div v-for="item in mxList" class="wpkitem">
+					<div class="kechengming">{{item.KCMC}} @{{item.JSXM}} <span v-if="item.RS != null">人数:{{item.RS}}</span></div>
+					<div v-for="item2 in item.list" class="kechengming">星期{{item2.week}} {{item2.jc}}节 ({{item2.zc}}周) ＃{{item2.js}}</div>
+				</div>
+			</div>
+		</div>
+		<div class="wpk" id="wpk" style="display: none;" v-on:click="wpkClick">
+			<div class="title">您有{{wpkNum}}节未排课</div>
+			<div class="tip">请注意相关时间安排</div>
+			<div class="wpkbox">
+				<div v-for="item in wpkList" class="wpkitem">
+					<div class="kechengming">{{item.KCMC}}</div>
+					<div class="kechengming">@{{item.JSXM}}</div>
+				</div>
+			</div>
+		</div>
+		<div class="aboutPage" id="about" style="display: none;" v-on:click="aboutClick">
+			<div class="duomologo">
+				<img class="duomologo" width="108" height="62" src="./domoelogo.png">
+			</div>
+			<div class="version"><b>{{username}} 的专属课表</b></div>
+			<div class="thanks">
+				声明<br>
+				课表数据来自教务系统<br>
+				具体课程请遵循所在学院实际安排<br>
+				<br><br><br>
+				<!-- 鸣谢<br>
+				沈阳工业大学<br>
+				沈阳工业大学教务处<br>
+				沈阳工业大学软件学院 -->
+			</div>
+			<!-- <div class="footer">
+				Copyright © 2019 Domoe.cn. All Rights Reserved.
+			</div> -->
+		</div>
+	</div>
+	 <script type="text/javascript" src="http://tajs.qq.com/stats?sId=66385474" charset="UTF-8"></script>
+</body>
+    <script src="./js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript">
+    	var vm = new Vue({
+			created: function () {
+				this.init({"code":200,"table":{"code":200,"term":{"code":200,"total":"20","starttime":1708876800,"term":"2023-2024-2"},
+				"list":[
+				{"JSXM":"宗杨","KCMC":"soc期末考试","JX0404ID":"202320242000938","INFO":[{"KCSJMX":["505","506"],"KKZCMX":["9"],"JX0601MC":"在哪"}]},
+				{"JSXM":"任建","KCMC":"射频上机","INFO":[{"KCSJMX":["301","302"],"KKZCMX":["9"],"JX0601MC":"c104(A208)"}]},
+				{"JSXM":"任建","KCMC":"射频上机","INFO":[{"KCSJMX":["701","702","703","704","705","706"],"KKZCMX":["9"],"JX0601MC":"a210(b209)"}]},
+				{"JSXM":"任建","KCMC":"射频上机","INFO":[{"KCSJMX":["401","402","403","404"],"KKZCMX":["11"],"JX0601MC":"b210"}]},
+				{"JSXM":"任建","KCMC":"射频上机","INFO":[{"KCSJMX":["405","406","407","408"],"KKZCMX":["12"],"JX0601MC":"f104(d104)"}]},
+				]},"user":"\u7fd4"});
+			 },
+	        el:"#app",
+	        data: {
+	        	startWeekOnD:0,//开学第一周的 周一时间戳
+	        	toastContent:"",
+	            week:1,
+	            originData:null,
+	            clockLineTop:35,
+	            wpkList:[],
+	            wpkNum:0,
+	            pkList:[],
+	            mxList:[],
+	            cellData:[],	//课程格子数据
+	            Date:{
+	            	M:12,
+	            	W1:1,
+	            	W2:1,
+	            	W3:1,
+	            	W4:1,
+	            	W5:1,
+	            	W6:1,
+	            	W7:1,
+	            },
+	            toDay:1,
+	            username:"墨墨"
+	        },
+	        methods:{
+	        	aboutClick:function(){
+	        		$("#about").fadeToggle(200); 
+	        	},
+	        	closeMx:function(){
+	        		$("#mx").fadeOut(200); 
+	        	},
+	        	mxClick:function(res){
+	        		var id = res.target.dataset.id;
+	        		var ids = id.split(",");
+	        		if(ids.length > 0){
+	        			var data = [];
+	        			for(var i in ids){
+	        				var item = ids[i];
+	        				for(var j in this.pkList){
+	        					var item2 = this.pkList[j];
+	        					if(item2.JX0404ID == item){
+	        						//格式化
+	        						var cell = {
+										'KCMC' : item2.KCMC,
+										'JSXM' : item2.JSXM,
+										'RS' : item2.RS,
+										'list' :[]
+	        						}
+	        						var map = {'1':"一",'2':"二",'3':"三",'4':"四",'5':"五",'6':"六",'7':"日"};
+	        						for(var l in item2.INFO){
+	        							var ltm = item2.INFO[l];
+	        							cell['list'].push({
+	        								week:map[ltm['KCSJ'].substr(0,1)+""],
+	        								jc:this.calJC(ltm['KCSJ']),
+	        								zc:ltm['KKZC'],
+	        								js:ltm['JX0601MC'] || "无教室"
+	        							});
+	        						}
+	        						data.push(cell);
+	        						break;
+	        					}
+	        				}
+	        			}
+	        			this.mxList = data;
+	        			$("#mx").fadeIn(200); 
+	        		}
+	        	},
+	        	calJC:function(str){
+	        		var l = (str.length-1)/2;
+	        		var s = "";
+	        		for(var i = 0;i<l;i++){
+	        			s += (parseInt(str.substr( 2*i+1,2)) + ",");
+	        		}
+	        		return s.substr(0,s.length-1);
+	        	},
+	        	init:function(data){
+	        		if(data.code != 200){
+	        			setTimeout(function(){this.showToast(data.errmsg);}.bind(this),500);
+	        			return;
+	        		}
+	        		//设置用户名
+	        		this.username = data.user;
+	        		data = data.table;
+
+	        		//设置时刻线
+	        		this.clockLine();
+
+	        		//设置数据
+	        		this.originData = data;
+	        		//直接获取本学期没有排课的信息
+	        		this.wpk();
+
+	        		//计算第一周周一凌晨的时间戳
+	        		var dateOb = new Date(data.term.starttime*1000);
+	        		var wel = dateOb.getDay();
+	        		var start = data.term.starttime;	//开学第一周的周一时间戳
+	        		if(wel == 0)
+	        			start -= 6*60*60*24;
+	        		else
+	        			start -= (wel-1)*60*60*24;
+	        		this.startWeekOnD = start;
+
+	        		//判断今天是周几
+	        		this.toDay = new Date().getDay();
+
+	        		//解析开课周次以及当前周次
+	        		var now = new Date().getTime()/1000;
+	        		//当前周次
+	        		var week = Math.ceil((now - data.term.starttime) / (60*60*24*7));
+	        		if(week < 1 || week > data.term.total){
+	        			//不在本学期开课周
+	        			setTimeout(function(){this.showToast("您当前不在开学周内噢！已显示本学期最后一周");}.bind(this),500);
+	        			this.viewWeek(data.term.total,false);
+	        		}else{
+	        			//console.log(week);
+	        			this.viewWeek(week,false);
+	        		}
+	        	},
+	        	wpkClick:function(){
+	        		$("#wpk").fadeToggle(200); 
+	        	},
+	        	wpk:function(){
+	        		//未排课数据
+	        		var wpkList = [];
+	        		var pkList = [];
+	        		for(var i in this.originData.list){
+	        			var item = this.originData.list[i];
+	        			if(item['INFO'].length == 0){
+	        				wpkList.push(item);
+	        			}else{
+	        				pkList.push(item)
+	        			}
+
+	        		}
+	        		this.wpkList = wpkList;
+	        		this.wpkNum = wpkList.length;
+	        		this.pkList = pkList;
+
+	        	},
+	        	left:function(){
+	        		if(this.week - 1 <= 0){
+	        			this.showToast("已经是第一周啦");
+	        		}else
+	        		this.viewWeek(this.week-1,false);
+	        	},
+	        	right:function(){
+	        		if(this.week + 1 > this.originData.term.total){
+	        			this.showToast("已经是最后一周啦");
+	        		}else
+	        		this.viewWeek(this.week+1,false);
+	        	},
+	        	viewWeek:function(week,nw = false){ //访问本学期特定周	nw 是否显示非本周 默认不显示
+	        		/*
+						根据需求找出所有需要显示的课程信息
+						并给出如下属性：
+							是否是本周
+							课程ID
+							教师
+							周次安排
+	        		*/
+	        		this.week = week;
+	        		//重组 Date
+	        		var nowWeekOnD = this.startWeekOnD + ((week - 1)*60*60*24*7);	//当前周的时间戳
+	        		var DateOb = new Date(nowWeekOnD * 1000);
+	        		var ob = {
+	        			M : DateOb.getMonth() + 1,
+	        			W1: DateOb.getDate(),
+	        			W2: new Date((nowWeekOnD + 1*60*60*24)* 1000).getDate(),
+	        			W3: new Date((nowWeekOnD+ 2*60*60*24)* 1000).getDate(),
+	        			W4: new Date((nowWeekOnD+ 3*60*60*24)* 1000).getDate(),
+	        			W5: new Date((nowWeekOnD+ 4*60*60*24)* 1000).getDate(),
+	        			W6: new Date((nowWeekOnD+ 5*60*60*24)* 1000).getDate(),
+	        			W7: new Date((nowWeekOnD+ 6*60*60*24)* 1000).getDate()
+	        		}
+	        		this.Date = ob;
+
+	        		var data = [];
+	        		for(var i in this.pkList){
+	        			var item = this.pkList[i];
+	        			for(var j in item.INFO){
+	        				var info = item.INFO[j];
+	        				var cw = this.currentWeek(week,info.KKZCMX);
+	        				if(!nw && !cw)
+	        					continue;
+		        			var cell = {
+		        				'id' : i,	//颜色ID
+		        				'JX0404ID' : item.JX0404ID,	//课程号
+		        				'cw' : cw, //是否为本周
+		        				'JX0601MC' : info.JX0601MC,	//教室
+		        				'KCSJMX' : this.parseKCSJMX(info.KCSJMX),	//周节
+								'JSXM': item.JSXM,	//教师
+								'KCMC': item.KCMC	//课程名
+		        			}
+		        			data.push(cell);
+	        			}
+	        		}
+	        		this.drawCell(data);
+	        	},
+	            drawCell:function(data){	//绘制课程格子
+	            	//console.log(data);
+	            	/*
+						格子属性
+							格子颜色 （本周 非本周）
+							格子左边 上边 距离
+							格子内容 课程名 、 地点 、教师  总长度不能超过 35个字符，超过，则减少课程名显示字数
+	            	*/
+	            	var view = [];
+	            	var map = [
+	            		""
+	            	];
+	            	for(var i in data){
+	            		var item = data[i];
+	            		//再遍历一遍是否有排课冲突的课
+	            		var chongtu = [];
+	            		// for(var j = parseInt(i)+1;j < data.length ;j++){
+	            		// 	var item2 = data[j];
+	            		// 	if(item.KCSJMX.id == item2.KCSJMX.id){
+	            		// 		chongtu.push(item2);
+	            		// 	}
+	            		// }
+	            		for(var j in data){
+	            			var item2 = data[j];
+	            			if(item.KCSJMX.id == item2.KCSJMX.id && item2.JX0404ID != item.JX0404ID){
+	            				//冲突
+	            				chongtu.push(item2)
+	            			}
+	            		}
+
+	            		if(chongtu.length == 0){
+	            			var cell = {
+	            				left : 42 + (item.KCSJMX.w - 1) * 60,
+	            				top : 37 + (item.KCSJMX.s - 1) * 60,
+	            				height: 60 * item.KCSJMX.l - 10,
+	            				color: "color" + (item.cw ? (item.id % 7 + 1) : "No"),
+	            				content:this.getContent([item]),
+	            				id:item.JX0404ID
+		            		}
+		            		view.push(cell);
+	            		}else{
+	            			chongtu.push(item);
+	            			var cid = "";
+	            			for(var l in chongtu){
+	            				cid += (chongtu[l].JX0404ID + ",");
+	            			}
+	            			cid = cid.substr(0,cid.length-1);
+	            			var cell = {
+	            				left : 42 + (item.KCSJMX.w - 1) * 60,
+	            				top : 37 + (item.KCSJMX.s - 1) * 60,
+	            				height: 60 * item.KCSJMX.l - 10,
+	            				color: "colorB" ,
+	            				content:this.getContent(chongtu),
+	            				id:cid
+	            			}
+		            		view.push(cell);
+	            		}
+	            		
+	            	}
+	            	//console.log(view);
+	            	this.cellData = view;
+
+	            },
+	            clockLine:function(){
+	            	var dayNow = parseInt((new Date().getTime() /1000) % (60*60*24) )+ 60*60*8;
+	            	//console.log(dayNow);
+	            	var lineTop = parseInt(this.lineTop(dayNow));
+	            	//console.log(lineTop);
+	            	this.clockLineTop = lineTop;
+	            },
+	            lineTop:function(dayNow){
+	            	//判断在哪个时间段的区间里
+	            	var map = {"8_30":30600,"10_05":36300,"10_25":37500,"12_00":43200,"13_30":48600,"15_05":54300,"15_25":55500,"17_00":61200,"18_00":64800,"19_35":70500,"19_40":70800,"20_25":73500};
+	            	if(dayNow < map['8_30']){
+	            		return 35;
+	            	}else if(dayNow < map['10_05']){	//12节课
+	            		var dit = (dayNow - map['8_30']) / (map['10_05'] - map['8_30']);
+	            		return  (155 - 35)*dit + 35;
+	            	}else if(dayNow < map['10_25']){	//下课
+	            		return 155;
+	            	}else if(dayNow < map['12_00']){	//34节课
+	            		var dit = (dayNow - map['10_25']) / (map['12_00'] - map['10_25']);
+	            		return  (275 - 155)*dit + 155;
+	            	}else if(dayNow < map['13_30']){	//下课
+	            		return  275;
+	            	}else if(dayNow < map['15_05']){	//56节课
+	            		var dit = (dayNow - map['13_30']) / (map['15_05'] - map['13_30']);
+	            		return  (395 - 275)*dit + 275;
+	            	}else if(dayNow < map['15_25']){	//下课
+	            		return  395;
+	            	}else if(dayNow < map['17_00']){	//78节课
+	            		var dit = (dayNow - map['15_25']) / (map['17_00'] - map['15_25']);
+	            		return  (515 - 395)*dit + 395;
+	            	}else if(dayNow < map['18_00']){	//下课
+	            		return  515;
+	            	}else if(dayNow < map['19_35']){	//910节课
+	            		var dit = (dayNow - map['18_00']) / (map['19_35'] - map['18_00']);
+	            		return  (635 - 515)*dit + 515;
+	            	}else if(dayNow < map['19_40']){	//下课
+	            		return  635;
+	            	}else if(dayNow < map['20_25']){	//1112节课
+	            		var dit = (dayNow - map['19_40']) / (map['20_25'] - map['19_40']);
+	            		return  (750 - 635)*dit + 635;
+	            	}else {	//下课
+	            		return  750;
+	            	}
+	            },
+	            currentWeek:function(week,weeks){	//判断是否为本周
+	            	for(var i in weeks){
+	            		if(weeks[i] == week)
+	            			return true;
+	            	}
+	            	return false;
+	            },
+	            parseKCSJMX:function(MX){	//解析周节
+	            	/*
+						{
+							"id": ""	//防冲突ID
+							"w" : 1-7,	//周几
+							"s" : 1-11,	//起始点
+							"l"	: 2-10	//起始长度
+						}
+	            	*/
+	            	var w = MX[0].substr(0,1);
+	            	var s = parseInt(MX[0].substr(1,2));
+	            	var l = MX.length;
+	            	return {
+	            		'id' : w+"_"+s+"_"+"l",
+	            		'w':w,
+	            		's':s,
+	            		'l':l
+	            	};
+	            },
+	            getContent:function(item){ //.NET架构开发实习 <b>#B-123</b> @邵中
+	            	if(item.length == 1){
+	            		item = item[0];
+	            		item.JX0601MC = item.JX0601MC || "无教室";
+	            		item.JSXM = item.JSXM || '';
+		            	if(item.JSXM.length + item.KCMC.length + item.JX0601MC.length <= 18){
+		            		return item.KCMC + " #"+item.JX0601MC +" @"+item.JSXM;
+		            	}else{
+		            		return item.KCMC.substr(0,18-(item.JSXM.length + item.JX0601MC.length)) + "... #"+item.JX0601MC +" @"+item.JSXM;
+		            	}
+	            	}else{
+	            		var str = "";
+	            		for(var i = 0; i<2 && i<item.length;i++){
+	            			var itm = item[i];
+	            			if(itm.KCMC.length > 5){
+	            				str += (itm.KCMC.substr(0,5)+"... ");
+	            			}else{
+	            				str += itm.KCMC;
+	            			}
+	            			str += "，"
+	            		}
+	            		str = str.substr(0,str.length-1);
+	            		str += ("等"+item.length+"节课");
+	            		return str;
+	            	}
+	            },
+	            showToast:function(content){
+	            	this.toastContent = content;
+	            	$("#toast").fadeIn(200); 
+	            	setTimeout(function(){
+	            		$("#toast").fadeOut(200); 
+	            	},2000);
+	            }
+	        }
+	    })
+    </script>
+</html>
